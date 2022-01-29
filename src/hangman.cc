@@ -1,7 +1,10 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <sstream>
 #include <vector>
+
+#include "ansi.hh"
 
 #define HANGMEN {\
     " +---+\n |   |\n O   |\n/|\\  |\n/ \\  |\n     |\n-----+-", \
@@ -54,6 +57,9 @@ std::vector<int> str_find_all(const std::string& str, const std::string& sub) {
 }
 
 int main(int argc, char *argv[]) {
+    #ifdef _WIN32
+    SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+    #endif
     std::string filename;
     if (argc > 1) filename = argv[1];
     else filename = "words.txt";
@@ -64,9 +70,21 @@ int main(int argc, char *argv[]) {
     char display[word.size() + 1];
     for (unsigned long i = 0; i < word.size(); ++i) display[i] = '_';
     display[word.size()] = '\0';
+    std::vector<std::string> wrong;
     while (true) {
-        std::cout << display << '\n';
-        std::cout << hangmen[guesses];
+        std::system(
+            #ifdef _WIN32
+            "cls"
+            #else
+            "clear"
+            #endif
+        );
+        std::cout << color(BRIGHT_RED, "Wrong guesses:\n");
+        for (std::string& g : wrong) {
+            std::cout << "- " << color(RED, g) << '\n';
+        }
+        std::cout << color(BRIGHT_BLUE, display) << '\n';
+        std::cout << color(YELLOW, hangmen[guesses]);
         std::cout << "\nGuess a letter: ";
         std::string guess;
         std::getline(std::cin, guess);
@@ -75,10 +93,11 @@ int main(int argc, char *argv[]) {
             if (str_contains(word, guess)) {
                 for (int i : str_find_all(word, guess)) display[i] = guess[0];
                 if (word == display) {
-                    std::cout << display << "\nYou win!\n";
+                    std::cout << color(BRIGHT_GREEN, display) << "\nYou win!\n";
                     break;
                 }
             } else {
+                wrong.push_back(guess);
                 if (!--guesses) {
                     std::cout << "You lose, the word was '" << word << "'\n";
                     break;
