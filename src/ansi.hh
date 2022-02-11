@@ -1,6 +1,9 @@
 #ifndef ANSI_HH
 #define ANSI_HH
 
+#include <sstream>
+#include <string>
+
 #define RESET "\033[m"
 
 #define BLACK 30
