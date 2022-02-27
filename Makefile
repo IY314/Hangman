@@ -1,16 +1,19 @@
-IFLAGS := -Iinclude
 WFLAGS := -Wall -Werror -Wextra
 LFLAGS := -lncurses
-CFLAGS := -c ${WFLAGS} ${IFLAGS}
-.PHONY: all link mkdir
+CFLAGS := -c ${WFLAGS}
 
-all: mkdir hangman.o link
+.PHONY: all link clean
 
-link: mkdir
+all: link
+
+link: hangman.o
 	${CC} bin/*.o -o bin/hangman ${LFLAGS}
 
-mkdir:
+clean:
+	rm -rf bin
+
+bin:
 	mkdir -p bin
 
-hangman.o: mkdir src/hangman.c
+hangman.o: bin src/hangman.c
 	${CC} src/hangman.c -o bin/hangman.o ${CFLAGS}

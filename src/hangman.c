@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
     // init color
     start_color();
     init_pair(WRONG, COLOR_RED, COLOR_BLACK);
-    init_pair(DISPLAY, COLOR_BLUE, COLOR_BLACK);
+    init_pair(DISPLAY, COLOR_CYAN, COLOR_BLACK);
     init_pair(HANGMAN, COLOR_YELLOW, COLOR_BLACK);
     init_pair(WIN, COLOR_GREEN, COLOR_BLACK);
 
@@ -106,10 +106,11 @@ int main(int argc, char** argv) {
 
     // get word
     unsigned int lineCount = getLineCount(filename);
-    char** words = malloc(lineCount * WORDSIZE);
+    char** words = malloc(lineCount);
     getWords(words, filename);
     char* word = malloc(WORDSIZE);
     generateWord(word, words, lineCount);
+    for (unsigned int i = 0; i < lineCount; ++i) free(words[i]);
     free(words);
     unsigned int wordLength = strlen(word);
 
