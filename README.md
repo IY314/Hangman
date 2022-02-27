@@ -1,11 +1,11 @@
 # Hangman
-I made this repo because I needed to one-up my friends in making Hangman (they used Python, so I used C++).
+I made this repo because I needed to one-up my friends in making Hangman (they used Python, so I used C).
 
 ## Building
 ```sh
 git clone https://github.com/IY314/Hangman.git
 cd Hangman
-make build
+make
 ```
 
 ## Running
