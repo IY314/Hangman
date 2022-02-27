@@ -89,10 +89,11 @@ void init() {
 
     // init color
     start_color();
-    init_pair(WRONG, COLOR_RED, COLOR_BLACK);
-    init_pair(DISPLAY, COLOR_CYAN, COLOR_BLACK);
-    init_pair(HANGMAN, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(WIN, COLOR_GREEN, COLOR_BLACK);
+    use_default_colors();
+    init_pair(WRONG, COLOR_RED, -1);
+    init_pair(DISPLAY, COLOR_CYAN, -1);
+    init_pair(HANGMAN, COLOR_YELLOW, -1);
+    init_pair(WIN, COLOR_GREEN, -1);
 
     // init random
     srand(time(NULL));
