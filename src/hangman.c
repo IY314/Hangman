@@ -78,7 +78,7 @@ void generateWord(char* word, char** words, unsigned int lineCount) {
     strcpy(word, words[idx]);
 }
 
-int main(int argc, char** argv) {
+void init() {
     // init screen
     initscr();
     if (has_colors() == false) {
@@ -97,21 +97,20 @@ int main(int argc, char** argv) {
     // init random
     srand(time(NULL));
 
-    // get filename
-    char filename[128];
-    if (argc > 1)
-        strcpy(filename, argv[1]);
-    else
-        strcpy(filename, "words.txt");
+    // keypress detection
+    raw();
+    nonl();
+}
 
-    // get word
-    unsigned int lineCount = getLineCount(filename);
-    char** words = malloc(lineCount);
-    getWords(words, filename);
-    char* word = malloc(WORDSIZE);
-    generateWord(word, words, lineCount);
+void destroy(char** words, unsigned int lineCount) {
     for (unsigned int i = 0; i < lineCount; ++i) free(words[i]);
     free(words);
+    endwin();
+}
+
+void game(char** words, unsigned int lineCount) {
+    char* word = malloc(WORDSIZE);
+    generateWord(word, words, lineCount);
     unsigned int wordLength = strlen(word);
 
     // init game logic
@@ -130,13 +129,11 @@ int main(int argc, char** argv) {
         clear();
 
         // display wrong guess list
-        addcolor(WRONG, {
-            addstr("Wrong guesses:\n");
-            for (unsigned int i = 0; i < wrongCount; ++i) {
-                addch(wrongGuesses[i]);
-                if (i != wrongCount - 1) addstr(", ");
-            }
-        });
+        addcolor(WRONG, addstr("Wrong guesses:\n"));
+        for (unsigned int i = 0; i < wrongCount; ++i) {
+            addcolor(WRONG, addch(wrongGuesses[i]));
+            if (i != wrongCount - 1) addstr(", ");
+        }
         addch('\n');
 
         // display word status and hangman
@@ -147,19 +144,21 @@ int main(int argc, char** argv) {
 
         if (state == 1) {
             addcolor(WIN, addstr(display));
-            addstr("\nYou win!\nPress any key to exit");
-            getch();
+            addstr("\nYou win!\nPress enter to play again");
             break;
         } else if (state == -1) {
             addstr("You lose, the word was '");
             addstr(word);
-            addstr("'\nPress any key to exit");
-            getch();
+            addstr("'\nPress enter to play again");
             break;
         } else {
             // get character
             addstr("Guess a letter:\n");
             char guess = getch();
+            if (guess == '\e') {
+                state = -2;
+                break;
+            }
 
             // handle guess
             if (strchr(word, guess)) {
@@ -178,9 +177,33 @@ int main(int argc, char** argv) {
             }
         }
     }
+    free(word);
+    if (state == -2) {
+        destroy(words, lineCount);
+        exit(0);
+    }
+}
+
+int main(int argc, char** argv) {
+    init();
+
+    // get filename
+    char filename[128];
+    if (argc > 1)
+        strcpy(filename, argv[1]);
+    else
+        strcpy(filename, "words.txt");
+
+    unsigned int lineCount = getLineCount(filename);
+    char** words = malloc(lineCount);
+    getWords(words, filename);
+
+    char ch;
+
+    do game(words, lineCount);
+    while ((ch = getch()) == '\n' || ch == '\r');
 
     // Destruction logic
-    free(word);
-    endwin();
+    destroy(words, lineCount);
     return EXIT_SUCCESS;
 }
