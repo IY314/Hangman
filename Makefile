@@ -1,7 +1,16 @@
-.PHONY: build mkdir
+IFLAGS := -Iinclude
+WFLAGS := -Wall -Werror -Wextra
+LFLAGS := -lncurses
+CFLAGS := -c ${WFLAGS} ${IFLAGS}
+.PHONY: all link mkdir
 
-build: mkdir
-	$(CXX) src/hangman.cc -o bin/hangman -Wall -Werror -Wextra -O2 -std=c++11
+all: mkdir hangman.o link
+
+link: mkdir
+	${CC} bin/*.o -o bin/hangman ${LFLAGS}
 
 mkdir:
 	mkdir -p bin
+
+hangman.o: mkdir src/hangman.c
+	${CC} src/hangman.c -o bin/hangman.o ${CFLAGS}
